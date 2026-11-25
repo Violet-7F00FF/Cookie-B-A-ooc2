@@ -508,7 +508,7 @@ function render(text, opt={}){
   };
 
   const whoRow = (name, c, who) => `<div class="who" style="--c:${c}"><span class="nm2">${name}</span>
-      <span class="cnt">가부장 ↕ 조신<b id="cy-${who}">0</b></span><span class="cnt">착취 ↔ 당함<b id="cx-${who}">0</b></span></div>`;
+      <span class="cnt">가부장 ↕ 조신<b id="cy-${who}">0</b></span><span class="cnt">당함 ↔ 착취<b id="cx-${who}">0</b></span></div>`;
   const sbRows = QS.map((q,i)=>`${i===0?'<tr class="grp"><td colspan="4">가부장 ↑ · 조신함 ↓</td></tr>':''}${i===4?'<tr class="grp"><td colspan="4">착취당함 ← · 착취함 →</td></tr>':''}
       <tr><td class="q">${q.id}</td><td>${q.short}</td>
       <td class="s" style="--c:${cN}">${badge(aN.sc[i].n, `b-npc-${i}`)}</td>
