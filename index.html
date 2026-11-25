@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>배우자 사분면 진단 보고서 · Spouse Quadrant Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+:root{
+  --bg:#eef0f3; --sheet:#fff; --ink:#15171c; --sub:#6a707a; --faint:#a0a6ae;
+  --line:#e2e5e9; --line2:#f2f3f5;
+  --pc:#d2453b; --npc:#2f5aa8; --pcT:#d2453b; --npcT:#2f5aa8;
+  --sans:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+[hidden]{display:none!important}
+.mono{font-family:var(--mono)}
+
+.top{max-width:920px;margin:0 auto;padding:32px 20px 0;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.logo{font-weight:800;font-size:15px;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.logo i{width:14px;height:14px;display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-right:2px}
+.logo i b{background:var(--ink);border-radius:1px}
+.logo i b:nth-child(2){background:var(--pc)}
+.logo small{font-family:var(--mono);font-weight:400;font-size:11px;color:var(--faint);letter-spacing:.08em}
+main{max-width:920px;margin:0 auto;padding:20px 20px 72px}
+
+.btn{font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.primary:hover{background:#2c3038}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{border-color:transparent;padding:6px 10px;font-size:12px;color:var(--sub)}
+.btn.ghost:hover{border-color:var(--line);color:var(--ink)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+
+/* intake */
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 28px}
+.step{display:grid;grid-template-columns:72px 1fr;gap:16px;padding:24px 0;border-top:1px solid var(--line2)}
+.step:first-child{border-top:none}
+.step-no{font-family:var(--mono);font-size:11px;color:var(--sub);letter-spacing:.08em;padding-top:3px}
+.step h3{font-size:16px;font-weight:700}
+.step p{font-size:13px;color:var(--sub);margin-top:2px}
+details summary{cursor:pointer;font-size:13px;color:var(--sub);margin-top:12px;user-select:none}
+pre.ooc{white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:12px;line-height:1.75;background:var(--line2);border-radius:8px;padding:16px 18px;max-height:340px;overflow:auto;margin-top:10px;color:#333}
+textarea{width:100%;min-height:260px;font-family:var(--mono);font-size:12.5px;line-height:1.75;padding:16px 18px;border:1px solid var(--line);border-radius:8px;background:#fff;resize:vertical;color:var(--ink);margin-top:12px}
+textarea:focus{outline:none;border-color:var(--ink)}
+.npcpick{margin-top:14px;display:grid;gap:6px}
+.npcpick label{font-size:13px;font-weight:700}
+.npcpick label em{display:block;font-style:normal;font-weight:400;font-size:12px;color:var(--sub)}
+.npcpick input{font-family:var(--sans);font-size:14px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;max-width:280px;color:var(--ink);background:#fff}
+.npcpick input:focus{outline:none;border-color:var(--ink)}
+.err{color:#d2453b;font-size:13px;margin-top:10px;min-height:1em}
+
+/* toolbar */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.toolbar .grp{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.colors{background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 6px 4px 12px}
+.colors .clab{font-size:12px;color:var(--sub);font-weight:600;margin-right:2px;white-space:nowrap}
+.sw{display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:6px}
+.sw input[type=color]{width:22px;height:22px;border:none;padding:0;background:none;cursor:pointer;border-radius:50%;overflow:hidden}
+.sw input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.sw input[type=color]::-webkit-color-swatch{border:1px solid rgba(0,0,0,.12);border-radius:50%}
+.sw input[type=color]::-moz-color-swatch{border:1px solid rgba(0,0,0,.12);border-radius:50%}
+.nmin{-webkit-appearance:none;appearance:none;height:auto;font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:0;border:none;border-bottom:1px dashed var(--line);border-radius:0;background:transparent;padding:2px 4px;margin:0;width:80px;min-width:48px;max-width:260px;color:var(--ink);outline:none;line-height:1.4;box-sizing:content-box}
+.nmin:hover{border-bottom-color:var(--sub)}
+.nmin:focus{border-bottom:1px solid var(--ink)}
+
+/* report */
+.sheet{background:#fff;border:1px solid var(--line);border-radius:4px;padding:56px 56px 36px;box-shadow:0 1px 2px rgba(20,24,32,.04),0 16px 48px -16px rgba(20,24,32,.14)}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+.rh-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11px;color:var(--sub);letter-spacing:.06em}
+.rh-top .tag{display:flex;align-items:center;gap:8px}
+.rh-top .tag::before{content:'';width:6px;height:6px;border-radius:1px;background:var(--ink)}
+.rh h1{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1.25;margin-top:22px}
+.rh .en{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.12em;margin-top:2px}
+.rh-meta{display:grid;grid-template-columns:repeat(4,1fr);margin-top:28px;border-top:2px solid var(--ink);border-bottom:1px solid var(--line)}
+.rh-meta div{padding:12px 14px 12px 0}
+.rh-meta div+div{padding-left:14px;border-left:1px solid var(--line)}
+.rh-meta .span2{grid-column:span 2}
+.rh-meta dt{font-size:11px;color:var(--sub)}
+.rh-meta dd{font-size:15px;font-weight:700;margin-top:2px;word-break:keep-all}
+.rh-meta dd .a{color:var(--npcT)} .rh-meta dd .b{color:var(--pcT)} .rh-meta dd .x{color:var(--faint);font-weight:400;margin:0 6px}
+.rh-meta dd.mono{font-weight:500;font-size:13px;padding-top:2px}
+
+.sec{margin-top:48px}
+.sh{display:flex;align-items:baseline;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--ink);margin-bottom:22px}
+.sh .no{font-family:var(--mono);font-size:12px;color:var(--sub)}
+.sh h2{font-size:18px;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+.sh .en{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--faint)}
+.replay{white-space:nowrap;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--sub);background:none;border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer;margin-left:10px}
+.replay:hover{color:var(--ink);border-color:var(--ink)}
+
+/* ── hero: 사분면 + 채점판 ── */
+.herogrid{display:grid;grid-template-columns:400px 1fr;gap:36px;align-items:start}
+.quadwrap{padding:22px 0}
+.quad{position:relative;width:100%;aspect-ratio:1/1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;border:1px solid var(--line);border-radius:6px;overflow:visible}
+.cell{position:relative;background:#fafbfc;transition:background .6s ease}
+.cell:nth-child(1){border-radius:6px 0 0 0} .cell:nth-child(2){border-radius:0 6px 0 0}
+.cell:nth-child(3){border-radius:0 0 0 6px} .cell:nth-child(4){border-radius:0 0 6px 0}
+.cell b{position:absolute;font-size:13px;font-weight:800;color:#c3c8ce;letter-spacing:-.01em;transition:color .5s}
+.cell.TL b{left:12px;top:10px} .cell.TR b{right:12px;top:10px}
+.cell.BL b{left:12px;bottom:10px} .cell.BR b{right:12px;bottom:10px}
+.done .cell.hit{background:var(--hl)}
+.done .cell.hit b{color:var(--ink)}
+.ax-v{position:absolute;left:50%;top:0;bottom:0;width:1.5px;background:var(--ink);transform:translateX(-50%)}
+.ax-h{position:absolute;top:50%;left:0;right:0;height:1.5px;background:var(--ink);transform:translateY(-50%)}
+.al{position:absolute;font-size:12px;font-weight:700;background:#fff;padding:1px 6px;white-space:nowrap;line-height:1.4}
+.al.t{left:50%;top:0;transform:translate(-50%,-50%)} .al.b{left:50%;bottom:0;transform:translate(-50%,50%)}
+.al.l{left:0;top:50%;transform:translate(-30%,-50%)} .al.r{right:0;top:50%;transform:translate(30%,-50%)}
+.grid6{position:absolute;inset:0;pointer-events:none}
+.grid6 i{position:absolute;background:rgba(21,23,28,.05)}
+
+.dot{position:absolute;left:50%;top:50%;width:0;height:0;z-index:3;transition:left 1s cubic-bezier(.3,1.3,.5,1),top 1s cubic-bezier(.3,1.3,.5,1)}
+.landed .dot{left:var(--x);top:var(--y)}
+.dot i{position:absolute;left:-11px;top:-11px;width:22px;height:22px;border-radius:50%;background:var(--c);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.dot .tag{position:absolute;left:0;top:14px;transform:translateX(-50%);font-size:11px;font-weight:800;color:var(--c);white-space:nowrap;background:rgba(255,255,255,.9);padding:0 4px;border-radius:3px}
+.dot .say{position:absolute;left:0;bottom:17px;width:max-content;max-width:170px;white-space:normal;word-break:keep-all;font-size:12px;font-weight:600;line-height:1.45;color:var(--ink);background:#fff;border:1.5px solid var(--c);padding:6px 10px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.12);opacity:0;transform:translateX(var(--bx,-50%)) scale(.3);transform-origin:var(--to,50%) 100%;z-index:4}
+.dot .say::after{content:'';position:absolute;left:var(--tx,50%);bottom:-6px;margin-left:-5px;width:9px;height:9px;background:#fff;border-right:1.5px solid var(--c);border-bottom:1.5px solid var(--c);transform:rotate(45deg)}
+.dot.al-l .say{--bx:-16px;--tx:16px;--to:16px}
+.dot.al-r .say{--bx:calc(-100% + 16px);--tx:calc(100% - 16px);--to:calc(100% - 16px)}
+.dot.below .say{bottom:auto;top:36px;transform-origin:var(--to,50%) 0}
+.dot.below .say::after{bottom:auto;top:-6px;transform:rotate(225deg)}
+.dinged .dot .say{animation:say .5s cubic-bezier(.3,1.6,.5,1) forwards}
+.dinged .dot.n2 .say{animation-delay:.2s}
+@keyframes say{to{opacity:1;transform:translateX(var(--bx,-50%)) scale(1)}}
+
+.board .who{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 12px;border-radius:8px;background:var(--line2);margin-bottom:8px}
+.board .who .nm2{font-weight:800;color:var(--c);display:flex;align-items:center;gap:8px;min-width:0}
+.board .who .nm2::before{content:'';width:10px;height:10px;border-radius:50%;background:var(--c);flex-shrink:0}
+.cnt{font-size:11px;color:var(--sub);text-align:right;white-space:nowrap}
+.cnt b{display:block;font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums;font-weight:800;line-height:1.2}
+.cnt b.bump{animation:bump .25s ease}
+@keyframes bump{50%{transform:scale(1.25)}}
+.sb{width:100%;border-collapse:collapse;margin-top:12px}
+.sb td,.sb th{padding:6px 6px;font-size:12.5px;border-bottom:1px solid var(--line2);text-align:left}
+.sb th{font-size:11px;color:var(--sub);font-weight:600}
+.sb .grp td{font-size:11px;font-weight:700;color:var(--sub);background:#fafbfc;padding:5px 6px}
+.sb .q{font-family:var(--mono);font-size:11px;color:var(--faint);width:30px}
+.sb .s{width:56px;text-align:center}
+.sb th.s{color:var(--c);white-space:nowrap;width:auto;padding:6px 8px}
+.badge{display:inline-block;min-width:34px;padding:2px 7px;border-radius:999px;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;text-align:center;line-height:1.5;border:1.5px solid var(--c)}
+.badge.p{background:var(--c);color:#fff}
+.badge.m{background:#fff;color:var(--c)}
+.badge.z{border-color:var(--line);color:var(--faint);background:#fff}
+.sb .badge{opacity:0;transform:scale(.3)}
+.sb .badge.on{animation:pop .32s cubic-bezier(.3,1.8,.5,1) forwards}
+@keyframes pop{to{opacity:1;transform:scale(1)}}
+
+.verdicts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s}
+.done .verdicts{opacity:1;transform:none}
+.vd{border:1.5px solid var(--c);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.vd .em{font-size:26px;line-height:1}
+.vd .k{font-size:12px;color:var(--c);font-weight:700}
+.vd .v{font-size:20px;font-weight:900;letter-spacing:-.02em;line-height:1.2}
+.vd .v small{font-size:12px;font-weight:700;color:var(--sub);margin-left:6px}
+
+/* cards */
+.cards{display:grid;grid-template-columns:1fr 1fr;column-gap:40px}
+.cardx{display:flex;flex-direction:column;min-width:0}
+@supports (grid-template-rows:subgrid){ .cardx{display:grid;grid-row:span 6;grid-template-rows:subgrid;row-gap:0} }
+.nm{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--c);display:flex;align-items:center;gap:10px}
+.nm::before{content:'';width:12px;height:12px;border-radius:50%;background:var(--c);flex-shrink:0}
+.qbadge{display:flex;align-items:center;gap:10px;margin-top:14px}
+.qbadge .em{font-size:30px;line-height:1}
+.qbadge b{font-size:24px;font-weight:900;letter-spacing:-.02em}
+.qbadge .lv{font-size:11px;font-weight:700;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+.coord{font-size:12.5px;color:var(--sub);margin-top:6px}
+.coord b{color:var(--ink);font-variant-numeric:tabular-nums}
+.qdesc{font-size:13.5px;margin-top:12px;color:#3a3e46}
+.keys{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-content:flex-start}
+.keys span{font-size:12px;background:var(--line2);border-radius:999px;padding:3px 10px;color:#3a3e46}
+.quote{margin-top:16px;font-size:14px;line-height:1.7;padding:12px 14px;border-left:3px solid var(--c);background:var(--line2);border-radius:0 6px 6px 0}
+.quote:empty{visibility:hidden;padding:0;margin:0;border:0}
+
+/* table */
+table{width:100%;border-collapse:collapse}
+.tbl th,.tbl td{padding:11px 10px;border-bottom:1px solid var(--line2);text-align:left;vertical-align:top;font-size:13px}
+.tbl thead th{font-size:11px;font-weight:600;color:var(--sub);background:var(--line2);border-bottom:none}
+.tbl thead th:first-child{border-radius:6px 0 0 6px} .tbl thead th:last-child{border-radius:0 6px 6px 0}
+.tbl thead th.c{color:var(--c)}
+.tbl .qt{width:34%}
+.tbl .qt small{display:block;font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.06em}
+.tbl .gr td{font-size:11px;font-weight:700;color:var(--sub);padding:8px 10px;background:#fafbfc}
+.cx{display:flex;gap:8px;align-items:flex-start}
+.cx .badge{flex-shrink:0;margin-top:-1px}
+.tbl td .why{color:#3a3e46}
+
+/* combo */
+.combo{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;padding:22px;border:1px solid var(--line);border-radius:10px}
+.combo .side{text-align:center}
+.combo .side .em{font-size:34px;line-height:1.1}
+.combo .side b{display:block;font-size:20px;font-weight:900;letter-spacing:-.02em}
+.combo .side span{font-size:12px;font-weight:700;color:var(--c)}
+.combo .x{font-size:22px;color:var(--faint);font-weight:300}
+.relnote{text-align:center;font-size:13px;color:var(--sub);margin-top:12px}
+.comment{margin-top:18px;font-size:15px;line-height:1.75;padding-left:16px;border-left:3px solid var(--ink)}
+
+.rf{margin-top:52px;padding-top:14px;border-top:1px solid var(--ink);display:flex;justify-content:space-between;gap:16px;font-size:11px;color:var(--sub);flex-wrap:wrap}
+.rf .mono{letter-spacing:.06em}
+
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,16px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:9}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:760px){
+  .sheet{padding:32px 22px 28px}
+  .herogrid,.cards,.verdicts{grid-template-columns:1fr;gap:24px}
+  .cards{row-gap:0} .cardx+.cardx .nm{margin-top:36px}
+  .rh-meta{grid-template-columns:1fr 1fr}
+  .rh-meta div:nth-child(2){padding-left:0;border-left:none;border-top:1px solid var(--line)}
+  .rh-meta div:nth-child(3){border-top:1px solid var(--line)}
+  .step{grid-template-columns:1fr;gap:4px}
+  .rh h1{font-size:27px}
+  .sh .en{display:none}
+  .quadwrap{max-width:360px;margin:0 auto;width:100%}
+}
+
+html.final *,html.final *::before,html.final *::after{transition:none!important;animation:none!important}
+html.final .sb .badge.on{opacity:1;transform:none}
+html.final .dinged .dot .say{opacity:1;transform:translateX(var(--bx,-50%)) scale(1)}
+html.capture .sheet{width:880px;padding:56px 56px 36px;border:none;border-radius:0;box-shadow:none}
+html.capture .herogrid{grid-template-columns:400px 1fr;gap:36px}
+html.capture .cards{grid-template-columns:1fr 1fr;column-gap:40px}
+html.capture .cardx+.cardx .nm{margin-top:0}
+html.capture .verdicts{grid-template-columns:1fr 1fr}
+html.capture .rh-meta{grid-template-columns:repeat(4,1fr)}
+html.capture .rh-meta div:nth-child(2){padding-left:14px;border-left:1px solid var(--line);border-top:none}
+html.capture .rh-meta div:nth-child(3){border-top:none}
+html.capture .rh h1{font-size:34px}
+html.capture .quadwrap{max-width:none}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo"><i><b></b><b></b><b></b><b></b></i>배우자 사분면 <small>SPOUSE QUADRANT</small></div>
+</div>
+
+<main>
+  <section id="intake" class="card">
+    <div class="step">
+      <div class="step-no">STEP 01</div>
+      <div>
+        <h3>OOC를 복사해서, 채팅에 보내세요.</h3>
+        <p>AI가 8개 문항으로 PC와 NPC를 채점해 줘요.</p>
+        <div class="npcpick">
+          <label for="npcName">NPC 지정 <em>다인챗이면 진단할 캐릭터 이름을 적어 주세요. 비우면 기본 NPC로 진단해요.</em></label>
+          <input type="text" id="npcName" placeholder="예: 강도현" spellcheck="false" autocomplete="off">
+        </div>
+        <div class="btns"><button class="btn" id="copyOoc">OOC 복사</button></div>
+        <details>
+          <summary>OOC 전문 보기</summary>
+<pre class="ooc" id="oocText">*OOC: 이전 롤플레잉을 중단하고, 새로운 시점에서 에피소드를 시작한다. 이번 답변은 서술·대사·지문 없이 아래 양식만 출력한다. 아래 문항으로 PC와 NPC의 배우자 사분면을 진단한다.
+- 설정·대화·행동을 근거로 채점하고, 말과 행동이 다르면 행동을 우선. 미화·과장 금지
+- 각 문항 -3~+3 정수 (+3 매우 그렇다 / 0 반반 / -3 전혀 아니다)
+- '상대'는 PC에게는 NPC, NPC에게는 PC
+Q1 데이트·일정 등 정하는 건 늘 이 사람이다
+Q2 걱정하거나 다투면 목소리부터 커진다
+Q3 남들 앞에서 앞장서서 나선다
+Q4 책임지는 쪽은 자기여야 한다고 여긴다
+Q5 결국 상대가 이 사람을 챙기게 된다
+Q6 갈등이 생기면 상대가 먼저 맞춰 준다
+Q7 돈이든 마음이든 실속은 이 사람이 쥐고 있다
+Q8 상대가 이 사람 없이는 못 살게 됐다
+- 대표색: 캐릭터 상징색 #RRGGBB
+- 한마디: 결과를 들은 캐릭터가 할 법한 짧은 대사 한 줄
+- 아래 양식을 코드블록 안에 그대로 출력. 항목명 변경과 별표 금지
+- [NPC]도 [PC]와 같은 항목을 모두 작성
+- 양식 앞뒤에 다른 글을 쓰지 말 것
+
+&lt;&lt;배우자사분면&gt;&gt;
+[PC]
+이름:
+대표색:
+Q1: 점수 | 근거
+Q2: 점수 | 근거
+Q3: 점수 | 근거
+Q4: 점수 | 근거
+Q5: 점수 | 근거
+Q6: 점수 | 근거
+Q7: 점수 | 근거
+Q8: 점수 | 근거
+한줄평:
+한마디:
+[NPC]
+(PC와 같은 항목)
+[궁합]
+코멘트: 두 사람 조합에 대한 한두 문장
+&lt;&lt;끝&gt;&gt;*</pre>
+        </details>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-no">STEP 02</div>
+      <div>
+        <h3>AI의 답변을 그대로 붙여 넣으세요</h3>
+        <p>&lt;&lt;배우자사분면&gt;&gt;부터 &lt;&lt;끝&gt;&gt;까지 넣으면 돼요. 앞뒤에 다른 말이 섞여도 괜찮아요.</p>
+        <textarea id="input" spellcheck="false" placeholder="<<배우자사분면>>&#10;[PC]&#10;이름: ...&#10;..."></textarea>
+        <div class="btns"><button class="btn primary" id="go">보고서 발급</button></div>
+        <div class="err" id="err"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reportWrap" hidden>
+    <div class="toolbar">
+      <div class="grp colors">
+        <span class="clab">대표색</span>
+        <div class="sw"><input type="color" id="cNpc" title="색 바꾸기"><input type="text" class="nmin" id="nNpc" title="이름 바꾸기" spellcheck="false"></div>
+        <div class="sw"><input type="color" id="cPc" title="색 바꾸기"><input type="text" class="nmin" id="nPc" title="이름 바꾸기" spellcheck="false"></div>
+        <button class="btn ghost" id="cReset" title="OOC에서 받은 이름과 색(없으면 기본색)으로 되돌려요">원래대로</button>
+      </div>
+      <div class="grp">
+        <button class="btn" id="sound">🔔 소리 켜짐</button>
+        <button class="btn" id="back">← 다시 입력</button>
+        <button class="btn primary" id="png">PNG로 저장</button>
+      </div>
+    </div>
+    <article class="sheet" id="report"></article>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ───────── 설정 ───────── */
+const CREDIT = 'made by @Cookie_B_A';
+const LAB_NAME = 'SPOUSE QUADRANT LAB';
+
+const QS = [
+  {id:'Q1', axis:'y', short:'주도권',   text:'데이트·일정 등 정하는 건 늘 이 사람이다'},
+  {id:'Q2', axis:'y', short:'큰소리',   text:'걱정하거나 다투면 목소리부터 커진다'},
+  {id:'Q3', axis:'y', short:'앞장',     text:'남들 앞에서 앞장서서 나선다'},
+  {id:'Q4', axis:'y', short:'책임감',   text:'책임지는 쪽은 자기여야 한다고 여긴다'},
+  {id:'Q5', axis:'x', short:'챙김받기', text:'결국 상대가 이 사람을 챙기게 된다'},
+  {id:'Q6', axis:'x', short:'맞춰받기', text:'갈등이 생기면 상대가 먼저 맞춰 준다'},
+  {id:'Q7', axis:'x', short:'실속',     text:'돈이든 마음이든 실속은 이 사람이 쥐고 있다'},
+  {id:'Q8', axis:'x', short:'길들이기', text:'상대가 이 사람 없이는 못 살게 됐다'},
+];
+const AXMAX = 12; // 축마다 4문항 × 3점
+
+// 세로축: 가부장(+) ↔ 조신함(−) / 가로축: 착취당함(−) ↔ 착취함(+)
+const QUADS = {
+  TL:{name:'남편계',   emoji:'🛡️', en:'NAMPYEON', axis:'가부장 · 착취당함',
+      desc:'말없이 짐을 다 지는 사람. 힘든 일은 혼자 처리하고 "괜찮아" 한마디로 끝낸다. 옆에 있으면 세상이 조용해지는데, 정작 본인은 기댈 데가 없다.',
+      keys:['혼자 다 짊어짐','괜찮아가 입버릇','등이 넓음']},
+  TR:{name:'놈편계',   emoji:'💢', en:'NOMPYEON', axis:'가부장 · 착취함',
+      desc:'고집 세고 투덜대고 손이 많이 가는 사람. 그런데 투덜대면서도 할 건 다 해 놔서 미워할 수가 없다. 어느새 내가 이 사람 뒤치다꺼리를 하고 있다.',
+      keys:['투덜대며 다 함','고집불통','손이 많이 감']},
+  BL:{name:'마누라계', emoji:'🐰', en:'MANURA',   axis:'조신함 · 착취당함',
+      desc:'내 하루를 통째로 챙기는 사람. 밥은 먹었는지, 잠은 잤는지부터 묻고, 내가 웃으면 그걸로 됐다고 한다. 너무 다 내어 줘서 오히려 걱정이 된다.',
+      keys:['밥은 먹었어?','내 편 1순위','아낌없이 퍼 줌']},
+  BR:{name:'서방계',   emoji:'🌙', en:'SEOBANG',  axis:'조신함 · 착취함',
+      desc:'목소리 한 번 높이지 않는데 이상하게 모든 게 이 사람 뜻대로 흘러간다. 다정하게 챙겨 주는 손길에 익숙해지다 보면, 그 품을 벗어날 생각이 안 든다.',
+      keys:['조용한 실세','다정한 덫','빠져나갈 수 없음']},
+};
+
+/* ───────── 유틸 ───────── */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp = (n,a,b) => Math.max(a, Math.min(b, n));
+const pad = n => String(n).padStart(2,'0');
+const sgn = n => n>0 ? `+${n}` : n<0 ? `−${Math.abs(n)}` : '0';
+const tint = (hex,a) => { const h=hex.replace('#',''); const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16); return `rgba(${r},${g},${b},${a})`; };
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1800); }
+async function copy(text){
+  try{ await navigator.clipboard.writeText(text); }
+  catch{ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+}
+function hash(s){ let h=0; for(const c of s) h=(h*31 + c.codePointAt(0))>>>0; return h.toString(16).toUpperCase().padStart(8,'0').slice(-4); }
+
+/* ───────── 파서 ───────── */
+function parse(text){
+  const out = {PC:{}, NPC:{}, MATCH:{}};
+  let cur = null, last = null;
+  String(text).replace(/\r/g,'').split('\n').forEach(raw => {
+    const line = raw.replace(/\*\*|__|`/g,'').trim().replace(/^[-•·*]\s+/,'');
+    if(!line || /^<<.*>>\*?\)?$/.test(line)) return;
+    const s = line.match(/^\[\s*(PC|NPC|궁합)\s*\]/i);
+    if(s){ const k=s[1].toUpperCase(); cur = k==='PC'?'PC':k==='NPC'?'NPC':'MATCH'; last=null; return; }
+    if(!cur) return;
+    const q = line.match(/^Q\s*([1-8])(?![0-9])[^:：]{0,40}[:：]\s*(.*)$/i);
+    if(q){ last='Q'+q[1]; out[cur][last]=q[2].trim(); return; }
+    const m = line.match(/^([^:：|"“]{1,12})[:：]\s*(.*)$/);
+    if(m){ last = m[1].replace(/\s/g,''); out[cur][last] = m[2].trim(); }
+    else if(last){ out[cur][last] += ' ' + line; }
+  });
+  return out;
+}
+function qscore(v){
+  v = String(v||'').replace(/[−–—]/g,'-');
+  const i = v.indexOf('|');
+  const a = i<0 ? v : v.slice(0,i);
+  const m = a.match(/[+-]?\s*\d+/);
+  const n = m ? clamp(parseInt(m[0].replace(/\s/g,''),10),-3,3) : 0;
+  let why = i<0 ? (m ? a.replace(m[0],'') : a) : v.slice(i+1);
+  why = why.replace(/^[\s\-–—,.:점]+/,'').trim();
+  return {n, why, found: !!m};
+}
+function analyze(d){
+  const sc = QS.map(q=>qscore(d[q.id]));
+  const y = QS.reduce((s,q,i)=>s+(q.axis==='y'?sc[i].n:0),0);
+  const x = QS.reduce((s,q,i)=>s+(q.axis==='x'?sc[i].n:0),0);
+  const key = (y>=0?'T':'B') + (x>=0?'R':'L');
+  const tot = Math.abs(x)+Math.abs(y);
+  const lv = tot>=16 ? '찐' : tot<=5 ? '살짝' : '';
+  const edge = x===0 || y===0;
+  return {sc, x, y, key, q:QUADS[key], lv, edge, found: sc.some(s=>s.found)};
+}
+const yWord = y => y>=0 ? '가부장' : '조신함';
+const xWord = x => x>=0 ? '착취함' : '착취당함';
+const pos = v => 50 + v/AXMAX*38; // %
+
+/* ───────── 대표색 · 이름 ───────── */
+const DEFAULT_COLORS = {pc:'#d2453b', npc:'#2f5aa8'};
+let aiColors = {...DEFAULT_COLORS}, colors = {...DEFAULT_COLORS};
+let aiNames = {pc:'', npc:''}, names = {pc:'', npc:''};
+function normHex(v){
+  const m = String(v||'').match(/#?([0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![0-9a-fA-F])/);
+  if(!m) return null;
+  let h = m[1]; if(h.length===3) h = h.split('').map(c=>c+c).join('');
+  return '#'+h.toLowerCase();
+}
+
+/* ───────── 소리 (띠롱!) ───────── */
+let AC = null;
+let soundOn = true;
+try{ soundOn = localStorage.getItem('sq-sound') !== 'off'; }catch{}
+function audio(){ try{ AC = AC || new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume(); }catch{} return AC; }
+function beep(freq, dur, vol, when=0, type='sine'){
+  if(!soundOn) return; const ac = audio(); if(!ac) return;
+  try{
+    const t = ac.currentTime + when, o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.008); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t+dur+.05);
+  }catch{}
+}
+const tick = (n) => beep(n>0?1500:n<0?1100:1300, .07, .035, 0, 'triangle');
+const ding = () => { beep(1175,.28,.13); beep(1568,.7,.13,.13); };
+function syncSoundBtn(){ $('#sound').textContent = soundOn ? '🔔 소리 켜짐' : '🔕 소리 꺼짐'; }
+
+/* ───────── 렌더 ───────── */
+let current = {text:'', pc:'', npc:''};
+let A = {pc:null, npc:null};
+const sh = (no, ko, en, extra='') => `<div class="sh"><span class="no">${no}</span><h2>${ko}</h2>${extra}<span class="en">${en}</span></div>`;
+const badge = (n, cls='') => `<span class="badge ${n>0?'p':n<0?'m':'z'} ${cls}">${sgn(n)}</span>`;
+
+function render(text, opt={}){
+  const {keepColors=false, instant=false} = opt;
+  const D = parse(text), P = D.PC, N = D.NPC, M = D.MATCH;
+  const aP = analyze(P), aN = analyze(N);
+  if(!aP.found && !aN.found){
+    $('#err').textContent = '채점 결과를 찾지 못했어요. [PC], [NPC] 머리말과 "Q1: 점수 | 근거" 같은 줄이 들어 있는지 확인해 주세요.';
+    return false;
+  }
+  $('#err').textContent = '';
+  aiNames = {pc: P.이름 || 'PC', npc: N.이름 || 'NPC'};
+  aiColors = {pc: normHex(P.대표색) || DEFAULT_COLORS.pc, npc: normHex(N.대표색) || DEFAULT_COLORS.npc};
+  if(!keepColors){ colors = {...aiColors}; names = {...aiNames}; }
+  const pRaw = names.pc.trim() || aiNames.pc, nRaw = names.npc.trim() || aiNames.npc;
+  current = {text, pc:pRaw, npc:nRaw};
+  A = {pc:aP, npc:aN};
+  const pName = esc(pRaw), nName = esc(nRaw);
+  const cP = colors.pc, cN = colors.npc;
+  const now = new Date();
+  const docNo = `SQ-${String(now.getFullYear()).slice(2)}${pad(now.getMonth()+1)}${pad(now.getDate())}-${hash(text)}`;
+  const issued = `${now.getFullYear()}.${pad(now.getMonth()+1)}.${pad(now.getDate())}`;
+
+  // 사분면 칸 강조
+  const hit = {};
+  [[aN,cN],[aP,cP]].forEach(([a,c])=>{ hit[a.key] = hit[a.key] ? 'rgba(21,23,28,.07)' : tint(c,.12); });
+  const cells = ['TL','TR','BL','BR'].map(k=>`<div class="cell ${k}${hit[k]?' hit':''}" style="--hl:${hit[k]||'transparent'}"><b>${QUADS[k].name}</b></div>`).join('');
+  const grid = [-6,6].map(v=>`<i style="left:${pos(v)}%;top:0;bottom:0;width:1px"></i><i style="top:${pos(-v)}%;left:0;right:0;height:1px"></i>`).join('');
+  // 두 점이 거의 겹치면 살짝 벌려 놓기
+  let nx = pos(aN.x), ny = pos(-aN.y), px = pos(aP.x), py = pos(-aP.y);
+  if(Math.abs(nx-px)<4 && Math.abs(ny-py)<4){ nx -= 2.5; px += 2.5; }
+  const say = v => String(v||'').trim().replace(/^["“'‘「『]+|["”'’」』]+$/g,'').trim();
+  // 말풍선 자리 정하기: 두 점이 가로로 가까우면 위쪽 점은 위로,아래쪽 점은 아래로 띄워서 안 겹치게
+  const lineN = say(N.한마디), lineP = say(P.한마디);
+  const near = lineN && lineP && Math.abs(nx-px) < 48;
+  const place = {};
+  if(near){
+    const nUp = ny < py || (ny === py);
+    place.n1 = {down:!nUp}; place.n2 = {down:nUp};
+    const nLeft = nx <= px;
+    const [L,R] = nLeft ? ['n1','n2'] : ['n2','n1'];
+    const xL = nLeft ? nx : px, xR = nLeft ? px : nx;
+    place[L].al = xL < 30 ? 'al-l' : 'al-r';
+    place[R].al = xR > 70 ? 'al-r' : 'al-l';
+  } else {
+    place.n1 = {down: ny<32, al: nx<28?'al-l':nx>72?'al-r':''};
+    place.n2 = {down: py<32, al: px<28?'al-l':px>72?'al-r':''};
+  }
+  const padTop = (!place.n1.down && lineN && ny<34) || (!place.n2.down && lineP && py<34);
+  const padBot = (place.n1.down && lineN && ny>62) || (place.n2.down && lineP && py>62);
+  const dot = (name, c, x, y, cls, line) => {
+    const pl = place[cls] || {};
+    const pos2 = (pl.al?' '+pl.al:'') + (pl.down?' below':'');
+    return `<div class="dot ${cls}${pos2}" style="--c:${c};--x:${x}%;--y:${y}%"><i></i><span class="tag">${name}</span>${line?`<span class="say">“${esc(line)}”</span>`:''}</div>`;
+  };
+
+  const whoRow = (name, c, who) => `<div class="who" style="--c:${c}"><span class="nm2">${name}</span>
+      <span class="cnt">가부장 ↕ 조신<b id="cy-${who}">0</b></span><span class="cnt">착취 ↔ 당함<b id="cx-${who}">0</b></span></div>`;
+  const sbRows = QS.map((q,i)=>`${i===0?'<tr class="grp"><td colspan="4">가부장 ↑ · 조신함 ↓</td></tr>':''}${i===4?'<tr class="grp"><td colspan="4">착취당함 ← · 착취함 →</td></tr>':''}
+      <tr><td class="q">${q.id}</td><td>${q.short}</td>
+      <td class="s" style="--c:${cN}">${badge(aN.sc[i].n, `b-npc-${i}`)}</td>
+      <td class="s" style="--c:${cP}">${badge(aP.sc[i].n, `b-pc-${i}`)}</td></tr>`).join('');
+  const vd = (name, a, c) => `<div class="vd" style="--c:${c}"><span class="em">${a.q.emoji}</span><div><div class="k">${name}</div><div class="v">${a.lv?a.lv+' ':''}${a.q.name}<small>${sgn(a.y)} · ${sgn(a.x)}</small></div></div></div>`;
+
+  const card = (name, d, a, c) => `
+    <div class="cardx" style="--c:${c}">
+      <div class="nm">${name}</div>
+      <div><div class="qbadge"><span class="em">${a.q.emoji}</span><b>${a.q.name}</b>${a.lv?`<span class="lv">${a.lv}</span>`:''}</div>
+        <div class="coord">${yWord(a.y)} <b>${sgn(a.y)}</b> · ${xWord(a.x)} <b>${sgn(a.x)}</b>${a.edge?' · 축 위에 걸쳐 있어요':''}</div></div>
+      <p class="qdesc">${a.q.desc}</p>
+      <div class="keys">${a.q.keys.map(k=>`<span>${k}</span>`).join('')}</div>
+      <p class="quote">${esc(d.한줄평||'')}</p>
+      <div></div>
+    </div>`;
+
+  const qrows = QS.map((q,i)=>`${i===0?'<tr class="gr"><td colspan="3">세로축 · 가부장(+) ↔ 조신함(−)</td></tr>':''}${i===4?'<tr class="gr"><td colspan="3">가로축 · 착취당함(−) ↔ 착취함(+)</td></tr>':''}
+    <tr><td class="qt"><small>${q.id} · ${q.short}</small>${q.text}</td>
+    <td style="--c:${cN}"><div class="cx">${badge(aN.sc[i].n)}<span class="why">${esc(aN.sc[i].why)}</span></div></td>
+    <td style="--c:${cP}"><div class="cx">${badge(aP.sc[i].n)}<span class="why">${esc(aP.sc[i].why)}</span></div></td></tr>`).join('');
+
+  const opp = {TL:'BR',BR:'TL',TR:'BL',BL:'TR'};
+  const rel = aN.key===aP.key ? `둘 다 ${aN.q.name}! 같은 사분면에 나란히 있어요.`
+    : opp[aN.key]===aP.key ? '정반대 사분면이에요. 겉도 속도 서로 반대쪽이에요.'
+    : aN.key[0]===aP.key[0] ? `둘 다 ${aN.key[0]==='T'?'가부장':'조신함'} 쪽이에요. 실속을 누가 쥐는지가 갈려요.`
+    : `둘 다 ${aN.key[1]==='R'?'착취함':'착취당함'} 쪽이에요. 겉모습만 서로 달라요.`;
+
+  const sheet = $('#report');
+  sheet.style.setProperty('--npcT', cN); sheet.style.setProperty('--pcT', cP);
+  sheet.innerHTML = `
+    <header class="rh">
+      <div class="rh-top"><span class="tag">SPOUSE QUADRANT REPORT</span><span>${docNo}</span></div>
+      <h1>배우자 사분면 진단 보고서</h1>
+      <div class="en">WHICH KIND OF SPOUSE ARE THEY?</div>
+      <dl class="rh-meta">
+        <div class="span2"><dt>피검자</dt><dd><span class="a">${nName}</span><span class="x">×</span><span class="b">${pName}</span></dd></div>
+        <div><dt>발급일</dt><dd class="mono">${issued}</dd></div>
+        <div><dt>측정 항목</dt><dd>8문항 · 2축</dd></div>
+      </dl>
+    </header>
+
+    <section class="sec" id="hero">
+      ${sh('01','사분면 판정','QUADRANT VERDICT','<button class="replay" id="replay" data-html2canvas-ignore>↻ 다시 채점</button>')}
+      <div class="herogrid">
+        <div class="quadwrap" style="${padTop?'padding-top:84px;':''}${padBot?'padding-bottom:96px;':''}"><div class="quad">
+          ${cells}
+          <div class="grid6">${grid}</div>
+          <div class="ax-v"></div><div class="ax-h"></div>
+          <span class="al t">가부장</span><span class="al b">조신함</span><span class="al l">착취당함</span><span class="al r">착취함</span>
+          ${dot(nName,cN,nx,ny,'n1',lineN)}${dot(pName,cP,px,py,'n2',lineP)}
+        </div></div>
+        <div class="board">
+          ${whoRow(nName,cN,'npc')}${whoRow(pName,cP,'pc')}
+          <table class="sb"><thead><tr><th></th><th>문항</th><th class="s" style="--c:${cN}">${nName}</th><th class="s" style="--c:${cP}">${pName}</th></tr></thead><tbody>${sbRows}</tbody></table>
+        </div>
+      </div>
+      <div class="verdicts">${vd(nName,aN,cN)}${vd(pName,aP,cP)}</div>
+    </section>
+
+    <section class="sec reveal">
+      ${sh('02','유형 해설','TYPE PROFILE')}
+      <div class="cards">${card(nName,N,aN,cN)}${card(pName,P,aP,cP)}</div>
+    </section>
+
+    <section class="sec reveal">
+      ${sh('03','문항별 채점','SCORE SHEET')}
+      <table class="tbl"><thead><tr><th>문항</th><th class="c" style="--c:${cN}">${nName}</th><th class="c" style="--c:${cP}">${pName}</th></tr></thead><tbody>${qrows}</tbody></table>
+    </section>
+
+    <section class="sec reveal">
+      ${sh('04','두 사람의 조합','COMBINATION')}
+      <div class="combo">
+        <div class="side" style="--c:${cN}"><div class="em">${aN.q.emoji}</div><b>${aN.q.name}</b><span>${nName}</span></div>
+        <div class="x">×</div>
+        <div class="side" style="--c:${cP}"><div class="em">${aP.q.emoji}</div><b>${aP.q.name}</b><span>${pName}</span></div>
+      </div>
+      <p class="relnote">${rel}</p>
+      ${M.코멘트?`<p class="comment">${esc(M.코멘트)}</p>`:''}
+    </section>
+
+    <footer class="rf reveal">
+      <span class="mono">${LAB_NAME} · ${docNo}</span>
+      <span>롤플레이 대화를 바탕으로 작성된 가상의 진단입니다.</span>
+      <span class="mono">${esc(CREDIT)}</span>
+    </footer>`;
+
+  $('#replay').onclick = ()=>{ audio(); playHero(); };
+  syncColorUI();
+  $('#intake').hidden = true;
+  $('#reportWrap').hidden = false;
+  if(instant){ finishHero(); document.querySelectorAll('#report .reveal').forEach(e=>e.classList.add('in')); }
+  else { window.scrollTo(0,0); armReveals(); setTimeout(playHero, 350); }
+  try{ localStorage.setItem('sq-last', text); }catch{}
+  return true;
+}
+
+/* ───────── 채점 → 띠롱! 시퀀스 ───────── */
+let timers = [];
+function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+function setCnt(who, axis, v, bump){
+  const el = document.getElementById(`c${axis}-${who}`); if(!el) return;
+  el.textContent = sgn(v);
+  if(bump){ el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+}
+function playHero(){
+  clearTimers();
+  const hero = $('#hero'); if(!hero) return;
+  hero.classList.remove('landed','dinged','done');
+  hero.querySelectorAll('.sb .badge').forEach(b=>b.classList.remove('on'));
+  const run = {pc:{x:0,y:0}, npc:{x:0,y:0}};
+  ['pc','npc'].forEach(w=>{ setCnt(w,'y',0); setCnt(w,'x',0); });
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){ finishHero(); return; }
+  let t = 250; const step = 160;
+  QS.forEach((q,i)=>{
+    ['npc','pc'].forEach(who=>{
+      timers.push(setTimeout(()=>{
+        const n = A[who].sc[i].n;
+        hero.querySelector(`.b-${who}-${i}`)?.classList.add('on');
+        run[who][q.axis] += n; setCnt(who, q.axis, run[who][q.axis], true);
+        tick(n);
+      }, t));
+      t += step;
+    });
+  });
+  timers.push(setTimeout(()=>hero.classList.add('landed'), t+250));
+  timers.push(setTimeout(()=>{ hero.classList.add('dinged'); ding(); }, t+1250));
+  timers.push(setTimeout(()=>hero.classList.add('done'), t+1550));
+}
+function finishHero(){
+  clearTimers();
+  const hero = $('#hero'); if(!hero) return;
+  hero.querySelectorAll('.sb .badge').forEach(b=>b.classList.add('on'));
+  ['pc','npc'].forEach(w=>{ setCnt(w,'y',A[w].y); setCnt(w,'x',A[w].x); });
+  hero.classList.add('landed','dinged','done');
+}
+
+/* ───────── 등장 애니메이션 ───────── */
+let io;
+function armReveals(){
+  if(io) io.disconnect();
+  const els = document.querySelectorAll('#report .reveal');
+  if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; }
+  io = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }),{threshold:.12});
+  els.forEach(e=>io.observe(e));
+}
+
+/* ───────── 이름 · 색 편집 UI ───────── */
+const _mc = document.createElement('canvas').getContext('2d');
+function fitName(el){
+  const cs = getComputedStyle(el);
+  _mc.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  el.style.width = Math.ceil(_mc.measureText(el.value || el.placeholder || '').width + 6) + 'px';
+  if(document.activeElement !== el) el.scrollLeft = 0;
+}
+function syncColorUI(){
+  $('#cPc').value = colors.pc; $('#cNpc').value = colors.npc;
+  for(const [id,who] of [['#nPc','pc'],['#nNpc','npc']]){
+    const el = $(id);
+    if(document.activeElement !== el) el.value = names[who];
+    el.placeholder = aiNames[who];
+    el.style.color = colors[who];
+    fitName(el);
+  }
+}
+
+/* ───────── PNG 저장 ───────── */
+async function savePNG(){
+  const btn = $('#png');
+  if(typeof html2canvas !== 'function'){ toast('저장 도구를 불러오는 중이에요. 잠시 후 다시 눌러 주세요'); return; }
+  btn.disabled = true; btn.textContent = '저장 중…';
+  const root = document.documentElement;
+  root.classList.add('final','capture');
+  finishHero();
+  document.querySelectorAll('#report .reveal').forEach(e=>e.classList.add('in'));
+  try{
+    if(document.fonts && document.fonts.ready) await document.fonts.ready;
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    const canvas = await html2canvas($('#report'), {scale:2, backgroundColor:'#ffffff', useCORS:true, logging:false, windowWidth:1000});
+    const a = document.createElement('a');
+    a.download = `배우자사분면_${current.pc}_${current.npc}.png`.replace(/[\\/:*?"<>|]/g,'');
+    a.href = canvas.toDataURL('image/png');
+    document.body.appendChild(a); a.click(); a.remove();
+    toast('PNG로 저장했어요');
+  }catch(e){ console.error(e); toast('저장에 실패했어요. 다시 시도해 주세요'); }
+  finally{
+    root.classList.remove('capture','final');
+    btn.disabled = false; btn.textContent = 'PNG로 저장';
+  }
+}
+
+/* ───────── OOC (NPC 지정) ───────── */
+const OOC_BASE = $('#oocText').textContent;
+function buildOOC(){
+  const n = $('#npcName').value.trim().replace(/[\r\n*]/g,'');
+  if(!n) return OOC_BASE;
+  const c = n.charCodeAt(n.length-1), jong = (c>=0xAC00 && c<=0xD7A3) ? (c-0xAC00)%28 : 0;
+  const ro = (jong===0 || jong===8) ? '로' : '으로';
+  return OOC_BASE.replace('PC와 NPC의 배우자 사분면을 진단한다.', `PC와 ${n}의 배우자 사분면을 진단한다. NPC는 ${n}${ro} 고정하고 [NPC] 칸에 작성한다.`);
+}
+
+/* ───────── 이벤트 ───────── */
+$('#npcName').addEventListener('input', ()=>{ $('#oocText').textContent = buildOOC(); try{ localStorage.setItem('sq-npc', $('#npcName').value); }catch{} });
+$('#copyOoc').onclick = async()=>{ await copy(buildOOC()); const n=$('#npcName').value.trim(); toast(n ? `${n} 지정 OOC를 복사했어요` : 'OOC를 복사했어요'); };
+$('#go').onclick = ()=>{ audio(); render($('#input').value); };
+$('#back').onclick = ()=>{ clearTimers(); $('#reportWrap').hidden = true; $('#intake').hidden = false; window.scrollTo(0,0); };
+$('#png').onclick = savePNG;
+$('#sound').onclick = ()=>{ soundOn = !soundOn; try{ localStorage.setItem('sq-sound', soundOn?'on':'off'); }catch{} syncSoundBtn(); if(soundOn){ audio(); ding(); } };
+
+let raf = 0;
+const rerender = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(()=>render(current.text, {keepColors:true, instant:true})); };
+['input','change'].forEach(ev=>{
+  $('#cPc').addEventListener(ev, ()=>{ colors.pc = $('#cPc').value; rerender(); });
+  $('#cNpc').addEventListener(ev, ()=>{ colors.npc = $('#cNpc').value; rerender(); });
+});
+['#nPc','#nNpc'].forEach(id=>$(id).addEventListener('input', e=>{ fitName(e.target); names = {pc:$('#nPc').value, npc:$('#nNpc').value}; rerender(); }));
+$('#nPc').addEventListener('blur', ()=>{ if(!$('#nPc').value.trim()){ names.pc=aiNames.pc; syncColorUI(); } });
+$('#nNpc').addEventListener('blur', ()=>{ if(!$('#nNpc').value.trim()){ names.npc=aiNames.npc; syncColorUI(); } });
+$('#cReset').onclick = ()=>{ colors = {...aiColors}; names = {...aiNames}; render(current.text, {keepColors:true, instant:true}); toast('원래대로 되돌렸어요'); };
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>{ fitName($('#nPc')); fitName($('#nNpc')); });
+
+(function init(){
+  syncSoundBtn();
+  if(location.hash){ try{ history.replaceState(null,'',location.pathname+location.search); }catch{} }
+  try{ const v=localStorage.getItem('sq-npc'); if(v){ $('#npcName').value=v; $('#oocText').textContent=buildOOC(); } }catch{}
+  try{ const last=localStorage.getItem('sq-last'); if(last) $('#input').value=last; }catch{}
+})();
+</script>
+</body>
+</html>
