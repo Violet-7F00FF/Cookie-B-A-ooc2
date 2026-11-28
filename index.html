@@ -303,7 +303,7 @@ Q8: 점수 | 근거
         <h3>AI의 답변을 그대로 붙여 넣으세요</h3>
         <p>&lt;&lt;배우자사분면&gt;&gt;부터 &lt;&lt;끝&gt;&gt;까지 넣으면 돼요. 앞뒤에 다른 말이 섞여도 괜찮아요.</p>
         <textarea id="input" spellcheck="false" placeholder="<<배우자사분면>>&#10;[PC]&#10;이름: ...&#10;..."></textarea>
-        <div class="btns"><button class="btn primary" id="go">보고서 발급</button></div>
+        <div class="btns"><button class="btn primary" id="go">보고서 발급</button><button class="btn" id="clearIn">입력 지우기</button></div>
         <div class="err" id="err"></div>
       </div>
     </div>
@@ -423,7 +423,7 @@ const DEFAULT_COLORS = {pc:'#d2453b', npc:'#2f5aa8'};
 let aiColors = {...DEFAULT_COLORS}, colors = {...DEFAULT_COLORS};
 let aiNames = {pc:'', npc:''}, names = {pc:'', npc:''};
 function normHex(v){
-  const m = String(v||'').match(/#?([0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![0-9a-fA-F])/);
+  const m = String(v||'').match(/#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![0-9a-zA-Z])/) || String(v||'').match(/(?:^|[\s|,(])([0-9a-fA-F]{6})(?![0-9a-zA-Z])/);
   if(!m) return null;
   let h = m[1]; if(h.length===3) h = h.split('').map(c=>c+c).join('');
   return '#'+h.toLowerCase();
@@ -715,6 +715,13 @@ function buildOOC(){
 $('#npcName').addEventListener('input', ()=>{ $('#oocText').textContent = buildOOC(); try{ localStorage.setItem('sq-npc', $('#npcName').value); }catch{} });
 $('#copyOoc').onclick = async()=>{ await copy(buildOOC()); const n=$('#npcName').value.trim(); toast(n ? `${n} 지정 OOC를 복사했어요` : 'OOC를 복사했어요'); };
 $('#go').onclick = ()=>{ audio(); render($('#input').value); };
+$('#clearIn').onclick = ()=>{
+  const ta = $('#input');
+  if(!ta.value.trim()){ toast('이미 비어 있어요'); return; }
+  ta.value = ''; $('#err').textContent = '';
+  try{ localStorage.removeItem('sq-last'); }catch{}
+  ta.focus(); toast('입력을 지웠어요');
+};
 $('#back').onclick = ()=>{ clearTimers(); $('#reportWrap').hidden = true; $('#intake').hidden = false; window.scrollTo(0,0); };
 $('#png').onclick = savePNG;
 $('#sound').onclick = ()=>{ soundOn = !soundOn; try{ localStorage.setItem('sq-sound', soundOn?'on':'off'); }catch{} syncSoundBtn(); if(soundOn){ audio(); ding(); } };
